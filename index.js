@@ -45,7 +45,7 @@ homePageServices()
 async function Products(){
   const ProductsCollection = client.db('daily-deal-cars').collection('products')
   try{
-    app.get('/products/:id', async(req, res)=>{
+    app.get('/categories/:id', async(req, res)=>{
       console.log(req.params.id);
       const id = req.params.id;
       const query = {categories_id: parseInt(id)}
@@ -86,6 +86,28 @@ async function User(){
 }
 User()
 .catch(err=>console.error('This is out of the function user error: ',err))
+
+
+
+//booking Collection-
+async function Booking(){
+  const BookingCollection = client.db('daily-deal-cars').collection('booking')
+  try{
+    app.post('/booking', async(req, res)=>{
+      const user = req.body;
+      const result = await BookingCollection.insertOne(user)
+      res.send(result)
+    })
+  }
+  catch{
+    err=>console.error('this booking error:', err)
+  }
+  finally{
+
+  }
+}
+Booking()
+.catch(err=>console.error('This is out of the function booking error: ',err))
 
 
 
