@@ -46,7 +46,6 @@ async function Products(){
   const ProductsCollection = client.db('daily-deal-cars').collection('products')
   try{
     app.get('/categories/:id', async(req, res)=>{
-      console.log(req.params.id);
       const id = req.params.id;
       const query = {categories_id: parseInt(id)}
       const cursor = ProductsCollection.find(query)
