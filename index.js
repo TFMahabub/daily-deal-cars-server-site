@@ -75,6 +75,13 @@ async function User(){
       const result = await UserCollection.insertOne(user)
       res.send(result)
     })
+    app.get('/user', async(req, res)=>{
+      const userEmail = req.query.email
+      console.log(userEmail);
+      const query = {email: userEmail}
+      const result = await UserCollection.findOne(query)
+      res.send(result)
+    })
   }
   catch{
     err=>console.error('this user error:', err)
