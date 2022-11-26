@@ -3,7 +3,7 @@ const cors = require('cors');
 const app = express()
 const port = process.env.PORT || 5000;
 require('dotenv').config()
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 // middleWare-
 app.use(cors())
@@ -51,6 +51,12 @@ async function Products(){
       const result  = await ProductsCollection.insertOne(product)
       res.send(result)
     })
+    app.delete('/categories/:id', async(req, res)=>{
+      const id = req.params.id;
+      const query = {_id: ObjectId(id)}
+      const result = await ProductsCollection.deleteOne(query)
+      res.send(result)
+    })
     app.get('/categories/:id', async(req, res)=>{
       const id = req.params.id;
       const query = {categories_id: parseInt(id)}
@@ -60,7 +66,6 @@ async function Products(){
     })
     app.get('/categories', async(req, res)=>{
       const userEmail = req.query.email;
-      console.log(userEmail);
       const query = {seller_email: userEmail}
       const cursor = ProductsCollection.find(query);
       const result = await cursor.toArray()
@@ -93,6 +98,13 @@ async function User(){
       const userEmail = req.query.email;
       const query = {email: userEmail}
       const result = await UserCollection.findOne(query)
+      res.send(result)
+    })
+    app.get('/user/:category', async(req, res)=>{
+      const category = req.params.category;
+      const query = {userCategory: category}
+      const cursor = UserCollection.find(query)
+      const result = await cursor.toArray()
       res.send(result)
     })
   }
