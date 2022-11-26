@@ -45,6 +45,12 @@ homePageServices()
 async function Products(){
   const ProductsCollection = client.db('daily-deal-cars').collection('products')
   try{
+    app.post('/categories', async(req, res)=>{
+      const product = req.body;
+      console.log(product);
+      const result  = await ProductsCollection.insertOne(product)
+      res.send(result)
+    })
     app.get('/categories/:id', async(req, res)=>{
       const id = req.params.id;
       const query = {categories_id: parseInt(id)}
@@ -76,8 +82,7 @@ async function User(){
       res.send(result)
     })
     app.get('/user', async(req, res)=>{
-      const userEmail = req.query.email
-      console.log(userEmail);
+      const userEmail = req.query.email;
       const query = {email: userEmail}
       const result = await UserCollection.findOne(query)
       res.send(result)
