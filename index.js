@@ -58,6 +58,14 @@ async function Products(){
       const result = await cursor.toArray()
       res.send(result)
     })
+    app.get('/categories', async(req, res)=>{
+      const userEmail = req.query.email;
+      console.log(userEmail);
+      const query = {seller_email: userEmail}
+      const cursor = ProductsCollection.find(query);
+      const result = await cursor.toArray()
+      res.send(result)
+    })
   }
   catch{
     err=>console.error('this Product error:', err)
