@@ -107,6 +107,19 @@ async function User(){
       const result = await cursor.toArray()
       res.send(result)
     })
+    app.delete('/user/:id', async(req, res)=>{
+      const id = req.params.id;
+      const query = {_id: ObjectId(id)}
+      const result = await UserCollection.deleteOne(query)
+      res.send(result)
+    })
+    app.put('/user/:id', async(req, res)=>{
+      const id = req.params.id;
+      const filter = {_id: ObjectId(id)}
+      const updateDoc = { $set : {verification: 'verified'}}
+      const result = await UserCollection.updateOne(filter, updateDoc)
+      res.send(result)
+    })
   }
   catch{
     err=>console.error('this user error:', err)
@@ -129,6 +142,19 @@ async function Booking(){
       const result = await BookingCollection.insertOne(user)
       res.send(result)
     })
+    app.get('/booking', async(req, res)=>{
+      const userEmail = req.query.email;
+      const query = {userEmail: userEmail}
+      const cursor = BookingCollection.find(query)
+      const result = await cursor.toArray()
+      res.send(result) 
+    })
+    app.delete('/booking/:id', async(req, res)=>{
+      const id = req.params.id;
+      const query = {_id: ObjectId(id)}
+      const result = await BookingCollection.deleteOne(query)
+      res.send(result)
+    })
   }
   catch{
     err=>console.error('this booking error:', err)
@@ -139,6 +165,8 @@ async function Booking(){
 }
 Booking()
 .catch(err=>console.error('This is out of the function booking error: ',err))
+
+
 
 
 
