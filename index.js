@@ -71,6 +71,12 @@ async function Products(){
       const result = await cursor.toArray()
       res.send(result)
     })
+    app.get('/categories_advertise', async(req, res)=>{
+      const query = {advertise: true}
+      const cursor = ProductsCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result)
+    })
     app.put('/categories/:id', async(req, res)=>{
       const productId = req.params.id;
       const filter = {_id: ObjectId(productId)}
