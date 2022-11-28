@@ -4,6 +4,7 @@ const app = express()
 const port = process.env.PORT || 5000;
 require('dotenv').config()
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const stripe = require("stripe")(process.env.STRIP_SECRET_KEY)
 
 // middleWare-
 app.use(cors())
@@ -150,6 +151,7 @@ User()
 //booking Collection-
 async function Booking(){
   const BookingCollection = client.db('daily-deal-cars').collection('booking')
+  const PaymentsCollection = client.db('daily-deal-cars').collection('payments')
   try{
     app.post('/booking', async(req, res)=>{
       const user = req.body;
@@ -169,6 +171,73 @@ async function Booking(){
       const result = await BookingCollection.deleteOne(query)
       res.send(result)
     })
+    app.get('/booking/:id', async(req, res)=>{
+      const id = req.params.id;
+      const query = {_id: ObjectId(id)}
+      const result = await BookingCollection.findOne(query)
+      res.send(result)
+    })
+
+
+    app.post("/payments/create-payment-intent", async (req, res) => {
+      try {
+        const { reSellPrice } = req.body;
+        console.log(reSellPrice);
+        const amount = Number(reSellPrice * 100);
+        // Create a PaymentIntent with the order amount and currency
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: amount,
+          currency: "usd",
+          "payment_method_types": [
+            "card"
+          ],
+        });
+    
+        res.send({
+          success: true,
+          clientSecret: paymentIntent.client_secret,
+        });
+      } catch (error) {
+        console.log(error.name, error.message);
+        res.send({
+          success: false,
+          error: error.message
+        })
+      }
+    });
+
+
+
+    
+  // Save payment information
+  app.post('/payments',  async (req, res) => {
+    try {
+      const payment = req.body;
+      const result = await PaymentsCollection.insertOne(payment);
+
+      const id = payment.bookingId;
+      const filter = { _id: ObjectId(id) }
+      const updateDoc = {
+        $set: {
+          paid: true,
+          transactionId: payment.transactionId,
+        }
+      }
+
+      const udpdatedResult = await BookingCollection.updateOne(filter, updateDoc);
+
+      res.send({
+        success: true,
+        data: result
+      })
+    } catch (error) {
+      console.log(error);
+      res.send({
+        success: false,
+        error: error.message
+      })
+    }
+  })
   }
   catch{
     err=>console.error('this booking error:', err)
